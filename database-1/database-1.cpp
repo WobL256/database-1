@@ -13,8 +13,9 @@ using namespace std;
 
 string filename = " ";
 int selectedElement = NULL;
-string elementName = " ";
+string elementName = "";
 int cursorPos = 1;
+int numberOfElementsInDB = 0;
 
 
 string getLineByNum(ifstream& inputFile, int targetLine) { //function to get an entire line from a text file as a string
@@ -49,6 +50,34 @@ char listenInput() {
     return key;
 }
 
+string cinLine() {
+    string input;
+    getline(cin, input);
+    return input;
+}
+
+void createElement(bool _refreshScreen = false) {
+    elementName = cinLine();
+    if (elementName != "") {
+        ofstream outputFile(elementName + ".txt");
+
+        if (outputFile.is_open()) {
+            //do stuff with the newly created element's file, like adding placeholder entries
+        }
+        else {
+            cout << "Eroare: Elementul nu a putut fii creat.";
+        }
+        if (_refreshScreen == true) {
+            refreshScreen("db-view", "db-def");
+        }
+        outputFile.close();
+        elementName = "";
+    }
+    else {
+        createElement(_refreshScreen);
+    }
+}
+
 void listenControls(string situation) {
     char key;
     if (situation == "db-def") {
@@ -69,6 +98,10 @@ void listenControls(string situation) {
             selectedElement = cursorPos;
             refreshScreen("elem-view", "elem-def");
         }
+        else if (key == 99) { //c key
+
+            refreshScreen("db-view", "add-elem");
+        }
         else { //if none of those keys are pressed just do nothing instead of closing the program
             refreshScreen("db-view", "db-def");
         }
@@ -78,7 +111,7 @@ void listenControls(string situation) {
         refreshScreen("elem-view", "elem-def");
     }
     else if (situation == "add-elem") {
-        cin >> elementName;
+        createElement(true);
     }
     else if (situation == "elem-def") {
         key = listenInput();
@@ -101,7 +134,7 @@ void controlsView(string situation) {
         cout << "\n|-------------------------| Introduceti numarul elementului de deschis |-------------------------|\n";
         cout << "> ";
     }
-    else if (situation == "cr-elem") {
+    else if (situation == "add-elem") {
         cout << "\n|--------------------------| Introduceti numele elementului de creat |--------------------------|\n";
         cout << "> ";
     }
@@ -145,7 +178,6 @@ void openDatabase(string inputFilename) {
     }
     system("cls");
 
-    //ofstream outputFile(filename + ".txt");
     ifstream inputFile(inputFilename + ".txt");
 
     string elementName;
@@ -160,6 +192,7 @@ void openDatabase(string inputFilename) {
             else {
                 cout << ">" << i << "<  " << getLineByNum(inputFile, i) << endl;
             }
+            if (getLineByNum(inputFile, i) != "----") numberOfElementsInDB++;
         }
 
         inputFile.close();
