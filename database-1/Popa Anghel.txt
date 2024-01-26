@@ -1,0 +1,3 @@
+nume: Popa
+prenume: Anghel
+varsa: 22

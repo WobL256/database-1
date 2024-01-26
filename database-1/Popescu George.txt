@@ -1,0 +1,3 @@
+nume: Popescu
+prenume: George
+varsa: 26
