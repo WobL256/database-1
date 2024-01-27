@@ -64,23 +64,42 @@ string cinLine() {
 void createElement(bool _refreshScreen = false) {
     selectedElementName = cinLine();
     if (selectedElementName != "") {
-        ofstream outputFile(selectedElementName + ".txt");
+        
+        ifstream dbFile(filename + ".json");
+        json jsonData;
+        dbFile >> jsonData;
+        dbFile.close();
 
-        if (outputFile.is_open()) {
-            //do stuff with the newly created element's file, like adding placeholder entries
+        int highestId = 0; //the highest id in the elements array, basically the number of elements present in the db
+        for (const auto& element : jsonData["database"]["elements"]) {
+            int currentId = element["id"];
+            if (currentId > highestId) highestId = currentId;  
         }
-        else {
-            cout << "Eroare: Elementul nu a putut fii creat.";
-        }
+
+        json newElement = {
+        {"id", highestId + 1},
+        {"nume", selectedElementName}
+        };
+
+
+        jsonData["database"]["elements"].push_back(newElement);
+
+        ofstream output(filename + ".json");
+        output << setw(4) << jsonData;
+        output.close();
+
+        selectedElementName = "";
         if (_refreshScreen == true) {
             refreshScreen("db-view", "db-def");
         }
-        outputFile.close();
-        selectedElementName = "";
     }
     else {
         createElement(_refreshScreen);
     }
+}
+
+void createAttribute(bool _refreshScreen) {
+    //attribute creation code goes here
 }
 
 void listenControls(string situation) {

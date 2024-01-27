@@ -1,40 +1,25 @@
 {
-  "database": {
-    "elements": [
-      {
-        "id": 1,
-        "nume": "Voicu Andrei",
-        "varsta": 17,
-        "data nasterii": "23-02-2006",
-        "locul nasterii": "Bucuresti",
-        "a": "a",
-        "b": "b"
-      },
-      {
-        "id": 2,
-        "nume": "Popescu George",
-        "varsta": 31
-      },
-      {
-        "id": 3,
-        "nume": "Mitrica Vlad",
-        "varsta": 25
-      },
-      {
-        "id": 4,
-        "nume": "Mitricaaaaaa Vlad",
-        "varsta": 30
-      },
-      {
-        "id": 5,
-        "nume": "Test test",
-        "varsta": 69
-      },
-      {
-        "id": 6,
-        "nume": "alex ggg",
-        "varsta": 15
-      }
-    ]
-  }
+    "database": {
+        "elements": [
+            {
+                "a": "a",
+                "b": "b",
+                "data nasterii": "23-02-2006",
+                "id": 1,
+                "locul nasterii": "Bucuresti",
+                "nume": "Voicu Andrei",
+                "varsta": 17
+            },
+            {
+                "id": 2,
+                "nume": "Popescu George",
+                "varsta": 31
+            },
+            {
+                "id": 3,
+                "nume": "Mitrica Vlad",
+                "varsta": 25
+            }
+        ]
+    }
 }
