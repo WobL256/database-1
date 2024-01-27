@@ -1,0 +1,16 @@
+{
+  "database": {
+    "elements": [
+      {
+        "id": 1,
+        "nume": "Voicu Andrei",
+        "varsta": 17
+      },
+      {
+        "id": 2,
+        "nume": "Popescu George",
+        "varsta": 31
+      }
+    ]
+  }
+}

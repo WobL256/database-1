@@ -1,0 +1,28 @@
+{
+  "database": {
+    "elements": [
+      {
+        "id": 1,
+        "nume": "Voicu Andrei",
+        "varsta": 17,
+        "data nasterii": "23-02-2006",
+        "locul nasterii": "Bucuresti"
+      },
+      {
+        "id": 2,
+        "nume": "Popescu George",
+        "varsta": 31
+      },
+      {
+        "id": 3,
+        "nume": "Mitrica Vlad",
+        "varsta": 25
+      },
+      {
+        "id": 4,
+        "nume": "Mitricaaaaaa Vlad",
+        "varsta": 30
+      }
+    ]
+  }
+}

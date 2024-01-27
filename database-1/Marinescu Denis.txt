@@ -1,3 +1,0 @@
-nume: Marinescu
-prenume: Denis
-varsa: 29

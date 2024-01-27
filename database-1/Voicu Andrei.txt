@@ -1,3 +1,0 @@
-nume: Voicu
-prenume: Andrei
-varsta: 17 ani 

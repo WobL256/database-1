@@ -3,8 +3,13 @@
 #include <string>
 #include <conio.h>
 #include <stdlib.h>
+#include <filesystem>
+#include <nlohmann/json.hpp>
+
 
 using namespace std;
+namespace fs = std::filesystem;
+using json = nlohmann::json;
 
 #define KEY_UP 72
 #define KEY_DOWN 80
@@ -13,9 +18,14 @@ using namespace std;
 
 string filename = " ";
 int selectedElement = NULL;
-string elementName = "";
+string selectedElementName = "";
 int cursorPos = 1;
+int cursorPosElem = 1;
 int numberOfElementsInDB = 0;
+
+fs::path currentDirectory = fs::current_path();
+fs::path dbDirectory = currentDirectory / "databases";
+fs::path elementDirectory = currentDirectory / "databases" / "db1" / "elements";       // TODO: Check if those folders are existent at startup, otherwise create them 
 
 
 string getLineByNum(ifstream& inputFile, int targetLine) { //function to get an entire line from a text file as a string
@@ -36,7 +46,7 @@ string getLineByNum(ifstream& inputFile, int targetLine) { //function to get an 
     return "----";
 }
 
-void openDatabase(string inputFilename); //the argument is used to tell the function which database to open and display, " " is used to ask the user
+void viewDatabase(string inputFilename); //the argument is used to tell the function which database to open and display, " " is used to ask the user
 void controlsView(string situation); //situation argument is used to display different controls for different contexts
 char listenInput(string situation); //situation argument is used for taking input in different contexts of the controlsView
 void refreshScreen(string screen, string controlsViewSituation);
@@ -57,9 +67,9 @@ string cinLine() {
 }
 
 void createElement(bool _refreshScreen = false) {
-    elementName = cinLine();
-    if (elementName != "") {
-        ofstream outputFile(elementName + ".txt");
+    selectedElementName = cinLine();
+    if (selectedElementName != "") {
+        ofstream outputFile(selectedElementName + ".txt");
 
         if (outputFile.is_open()) {
             //do stuff with the newly created element's file, like adding placeholder entries
@@ -71,7 +81,7 @@ void createElement(bool _refreshScreen = false) {
             refreshScreen("db-view", "db-def");
         }
         outputFile.close();
-        elementName = "";
+        selectedElementName = "";
     }
     else {
         createElement(_refreshScreen);
@@ -118,6 +128,14 @@ void listenControls(string situation) {
         if (key == 27) {
             refreshScreen("db-view", "db-def");
         }
+        else if (key == 50) { //down arrow
+            cursorPosElem++;
+            refreshScreen("elem-view", "elem-def");
+        }
+        else if (key == 56) { //up arrow
+            cursorPosElem--;
+            refreshScreen("elem-view", "elem-def");
+        }
         else {
             refreshScreen("elem-view", "elem-def");
         }
@@ -147,12 +165,53 @@ void controlsView(string situation) {
 void openElement(string elementName) {
     system("cls");
 
-    ifstream inputElementFile(elementName + ".txt");
+    ifstream inputElementFile(filename + ".json");
+    json data;
+    inputElementFile >> data;
+
     if (inputElementFile.is_open()) {
-        cout << "| << Esc |---------------------| Element deschis: " << elementName << " |-----------------------------|" << endl;
-        for (int i = 1; i <= 3; i++) {
-            cout << "|" << i << "| " << getLineByNum(inputElementFile, i) << endl; //list all lines of the file
+        cout << "| << Esc |---------------------| Element deschis: " << selectedElementName << " |-----------------------------|" << endl;
+        
+        // Check if the "database" key exists in the JSON structure
+        if (data.contains("database")) {
+            // Access the "elements" array within the "database" object
+            auto elementsArray = data["database"]["elements"];
+
+            int targetId = cursorPos; 
+
+            // Find the element with the desired "id"
+            auto targetElement = find_if(elementsArray.begin(), elementsArray.end(),
+                [targetId](const auto& element) {
+                    return element["id"] == targetId;
+                });
+
+            cursorPosElem = 1;
+
+            if (targetElement != elementsArray.end()) {
+                // Print attributes of the found element
+                int index = 1;
+                for (auto it = targetElement->begin(); it != targetElement->end(); ++it) {
+                    if (it.key() != "id") {
+                        if (cursorPosElem != index) {
+                            cout << "| " << it.key() << ": " << it.value() << endl;
+                        }
+                        else {
+                            cout << "> " << it.key() << ": " << it.value() << endl;
+                        }
+                        index++;
+                        cout << index;
+                    }
+                    
+                }
+            }
+            else {
+                cout << "Eroare: Elementul cu id-ul " << targetId << " nu a fost gasit." << endl;
+            }
         }
+        else {
+            cout << "Eroare: Structura bazei de date este invalida. Cheia 'elements' lipseste." << endl;
+        }
+
     }
     else {
         cout << "Eroare: Elementul nu exista! Apasati Enter sau Escape pentru a va intoarce la meniul anterior.";
@@ -166,7 +225,7 @@ void openElementByNum(int elementNumber) {
     inputFile.close();
 }
 
-void openDatabase(string inputFilename) {
+void viewDatabase(string inputFilename) {
     system("cls");
 
     char key = NULL;
@@ -178,33 +237,43 @@ void openDatabase(string inputFilename) {
     }
     system("cls");
 
-    ifstream inputFile(inputFilename + ".txt");
+    ifstream inputFile(inputFilename + ".json");
+    json data;
+    inputFile >> data;
 
-    string elementName;
-    if (inputFile.is_open()) { //read the database file
+    if (inputFile.is_open()) {
         int elementNumber = 0;
         cout << "| << Esc |----------------------| Baza de date deschisa: " << filename << " |------------------------------|" << endl;
 
-        for (int i = 1; i <= 10; i++) { //list all lines of the file with the cursor as well
-            if (cursorPos != i) {
-                cout << "|" << i << "| " << getLineByNum(inputFile, i) << endl;
-            }
-            else {
-                cout << ">" << i << "<  " << getLineByNum(inputFile, i) << endl;
-            }
-            if (getLineByNum(inputFile, i) != "----") numberOfElementsInDB++;
-        }
+        // Check if the "database" key exists in the JSON structure
+        if (data.contains("database")) {
+            // Access the "elements" array within the "database" object
+            auto elementsArray = data["database"]["elements"];
 
-        inputFile.close();
+            for (const auto& element : elementsArray) {
+                // Access the "nume" key within each element
+                string name = element["nume"];
+                if (cursorPos != element["id"]) {
+                    cout << "[" << element["id"] << "] " << name << endl;
+                }
+                else {
+                    cout << ">" << element["id"] << "<  " << name << endl;
+                    selectedElementName = element["nume"];
+                }
+            }
+        }
+        else {
+            cout << "Eroare: Structura bazei de date este invalida. Cheia 'database' lipseste." << endl;
+        }
     }
     else {
-        cout << "Eroare: Nu s-a putut deschide baza de date [" << inputFilename << "]!" << endl;
+        cout << "Eroare: Nu s-a putut deschide baza de date." << endl;
     }
 }
 
 int main() //main function of the program
 {
-    openDatabase(" "); //open the database and display it, " " is used to tell the function to ask the user for a database
+    viewDatabase(" "); //open the database and display it, " " is used to tell the function to ask the user for a database
     controlsView("db-def"); //display the controls view on the screen, "db-def" is used to tell the function to display the default controls screen
     listenControls("db-def");
 }
@@ -212,7 +281,7 @@ int main() //main function of the program
 void refreshScreen(string screen, string controlsViewSituation) {
     if (screen == "db-view") {
         system("cls");
-        openDatabase(filename);
+        viewDatabase(filename);
         controlsView(controlsViewSituation);
         listenControls(controlsViewSituation);
     }
