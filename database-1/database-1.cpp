@@ -23,6 +23,9 @@ int cursorPos = 1;
 int cursorPosElem = 1;
 int numberOfElementsInDB = 0;
 
+string newAttribute = "";
+string newAttributeValue = "";
+
 string getLineByNum(ifstream& inputFile, int targetLine) { //function to get an entire line from a text file as a string
     string line;
     int currentLine = 0;
@@ -98,8 +101,31 @@ void createElement(bool _refreshScreen = false) {
     }
 }
 
-void createAttribute(bool _refreshScreen) {
-    //attribute creation code goes here
+void createAttribute(bool _refreshScreen = false) {
+    ifstream dbFile(filename + ".json");
+    json jsonData;
+    dbFile >> jsonData;
+    dbFile.close();
+
+    int targetId = 1;
+    auto& elementsArray = jsonData["database"]["elements"];
+    auto it = find_if(elementsArray.begin(), elementsArray.end(), [targetId](const auto& element) {
+        return element["id"] == targetId;
+    });
+
+    if (it != elementsArray.end()) {
+        (*it)[newAttribute] = newAttributeValue;
+
+        ofstream output(filename + ".json");
+        output << setw(4) << jsonData;  // pretty print with indentation
+        output.close();
+    }
+    else {
+        //throw an error
+        cout << "Eroare: elementul nu a fost gasit.";
+    }
+
+    refreshScreen("elem-view", "elem-def");
 }
 
 void listenControls(string situation) {
@@ -150,9 +176,20 @@ void listenControls(string situation) {
             cursorPosElem--;
             refreshScreen("elem-view", "elem-def");
         }
+        else if (key == 97) { //a key
+            refreshScreen("elem-view", "elem-add-atr");
+        }
         else {
             refreshScreen("elem-view", "elem-def");
         }
+    }
+    else if (situation == "elem-add-atr") {
+        newAttribute = cinLine();
+        refreshScreen("elem-view", "elem-add-val");
+    }
+    else if (situation == "elem-add-val") {
+        newAttributeValue = cinLine();
+        createAttribute(true);
     }
 }
 
@@ -173,6 +210,14 @@ void controlsView(string situation) {
     else if (situation == "elem-def") { //default controls for elem-view
         cout << "\n|------------------------------------------| Comenzi |------------------------------------------|\n";
         cout << "[A] Adaugare camp nou   [X] Stergere camp   [sus - jos] Navigare   [Enter] Modificare camp\n";
+    }
+    else if (situation == "elem-add-atr") { //default controls for elem-view
+        cout << "\n|--------------------------| Introduceti numele campului de creat |--------------------------|\n";
+        cout << "> ";
+    }
+    else if (situation == "elem-add-val") { //default controls for elem-view
+        cout << "\n|--------------------------| Introduceti valoarea campului de creat |--------------------------|\n";
+        cout << "> ";
     }
 }
 
@@ -299,7 +344,7 @@ void refreshScreen(string screen, string controlsViewSituation) {
     else if (screen == "elem-view") {
         system("cls");
         openElementByNum(selectedElement);
-        controlsView("elem-def");
-        listenControls("elem-def");
+        controlsView(controlsViewSituation);
+        listenControls(controlsViewSituation);
     }
 }

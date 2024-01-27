@@ -19,6 +19,14 @@
                 "id": 3,
                 "nume": "Mitrica Vlad",
                 "varsta": 25
+            },
+            {
+                "id": 4,
+                "nume": "Olteanu Marian"
+            },
+            {
+                "id": 5,
+                "nume": "test test"
             }
         ]
     }
