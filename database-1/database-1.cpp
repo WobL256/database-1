@@ -23,11 +23,6 @@ int cursorPos = 1;
 int cursorPosElem = 1;
 int numberOfElementsInDB = 0;
 
-fs::path currentDirectory = fs::current_path();
-fs::path dbDirectory = currentDirectory / "databases";
-fs::path elementDirectory = currentDirectory / "databases" / "db1" / "elements";       // TODO: Check if those folders are existent at startup, otherwise create them 
-
-
 string getLineByNum(ifstream& inputFile, int targetLine) { //function to get an entire line from a text file as a string
     string line;
     int currentLine = 0;
@@ -185,8 +180,6 @@ void openElement(string elementName) {
                     return element["id"] == targetId;
                 });
 
-            cursorPosElem = 1;
-
             if (targetElement != elementsArray.end()) {
                 // Print attributes of the found element
                 int index = 1;
@@ -199,7 +192,6 @@ void openElement(string elementName) {
                             cout << "> " << it.key() << ": " << it.value() << endl;
                         }
                         index++;
-                        cout << index;
                     }
                     
                 }
