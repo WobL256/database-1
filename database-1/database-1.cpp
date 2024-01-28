@@ -107,7 +107,7 @@ void createAttribute(bool _refreshScreen = false) {
     dbFile >> jsonData;
     dbFile.close();
 
-    int targetId = 1;
+    int targetId = cursorPos;
     auto& elementsArray = jsonData["database"]["elements"];
     auto it = find_if(elementsArray.begin(), elementsArray.end(), [targetId](const auto& element) {
         return element["id"] == targetId;
@@ -185,6 +185,9 @@ void listenControls(string situation) {
     }
     else if (situation == "elem-add-atr") {
         newAttribute = cinLine();
+        if (newAttribute == "") {
+            newAttribute = cinLine();
+        }
         refreshScreen("elem-view", "elem-add-val");
     }
     else if (situation == "elem-add-val") {

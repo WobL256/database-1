@@ -2,13 +2,12 @@
     "database": {
         "elements": [
             {
-                "a": "a",
-                "b": "b",
                 "data nasterii": "23-02-2006",
+                "greutate": "68",
                 "id": 1,
                 "locul nasterii": "Bucuresti",
                 "nume": "Voicu Andrei",
-                "varsta": 17
+                "varsta": "17"
             },
             {
                 "id": 2,
@@ -27,6 +26,12 @@
             {
                 "id": 5,
                 "nume": "test test"
+            },
+            {
+                "": "77",
+                "id": 6,
+                "nume": "Oprea Ion",
+                "varsta": "57"
             }
         ]
     }
